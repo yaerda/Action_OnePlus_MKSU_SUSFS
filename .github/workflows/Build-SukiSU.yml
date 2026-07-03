@@ -212,6 +212,30 @@ jobs:
 
           cd ./common
           patch -p1 < 50_add_susfs_in_gki-${{ github.event.inputs.ANDROID_VERSION }}-${{ github.event.inputs.KERNEL_VERSION }}.patch || true
+
+          # 修复 fs/proc/base.c 缺失的 susfs_def.h include（Hunk #1 常在一加内核失败）
+          if ! grep -q "susfs_def.h" fs/proc/base.c; then
+            echo "=== base.c 缺 susfs_def.h include，手工补充 ==="
+            awk '
+              /^#include <linux\/dma-buf.h>/ && !done {
+                print;
+                print "#if defined(CONFIG_KSU_SUSFS_SUS_MAP) || defined(CONFIG_KSU_SUSFS_OPEN_REDIRECT)";
+                print "#include <linux/susfs_def.h>";
+                print "#endif";
+                done=1;
+                next
+              }
+              { print }
+            ' fs/proc/base.c > fs/proc/base.c.new
+            mv fs/proc/base.c.new fs/proc/base.c
+            echo "=== 验证 ==="
+            grep -n "susfs_def" fs/proc/base.c
+          else
+            echo "base.c 已包含 susfs_def.h"
+          fi
+
+          echo "=== 检查所有 .rej ==="
+          find . -name "*.rej" 2>/dev/null | head -20
           echo "完成"
 
       - name: Apply Hide Stuff Patches
