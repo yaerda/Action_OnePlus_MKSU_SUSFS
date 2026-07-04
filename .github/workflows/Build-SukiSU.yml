@@ -184,12 +184,12 @@ jobs:
       - name: Add KernelSU-SukiSU Ultra
         run: |
           cd kernel_workspace/kernel_platform
-          curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh" | bash -s builtin
+          curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh" | bash -s susfs-main
           cd ./KernelSU
-          KSU_VERSION=$(expr $(/usr/bin/git rev-list --count main) "+" 10606)
-          echo "KSUVER=$KSU_VERSION" >> $GITHUB_ENV
-          export KSU_VERSION=$KSU_VERSION
-          sed -i "s/DKSU_VERSION=12800/DKSU_VERSION=${KSU_VERSION}/" kernel/Makefile
+          # 不再强制覆盖版本号: SukiSU 的 kernel/Kbuild 会在编译时自动算 KSU_VERSION
+          # (VERSION_BASE 40000 + 提交数 - OFFSET, 约 40xxx, SukiSU manager 能识别)
+          # KSUVER 仅用于产物文件命名, 用固定标识即可, 不影响内核实际版本
+          echo "KSUVER=SukiSUUltra" >> $GITHUB_ENV
 
       - name: Apply Patches SukiSU Ultra
         run: |
