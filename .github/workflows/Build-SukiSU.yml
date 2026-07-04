@@ -184,7 +184,7 @@ jobs:
       - name: Add KernelSU-SukiSU Ultra
         run: |
           cd kernel_workspace/kernel_platform
-          curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh" | bash -s susfs-main
+          curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh" | bash -s builtin
           cd ./KernelSU
           # 不再强制覆盖版本号: SukiSU 的 kernel/Kbuild 会在编译时自动算 KSU_VERSION
           # (VERSION_BASE 40000 + 提交数 - OFFSET, 约 40xxx, SukiSU manager 能识别)
